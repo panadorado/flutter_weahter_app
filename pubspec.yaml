@@ -23,7 +23,13 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
+
+  # Gói này chứa một tập hợp các hàm và lớp mức cao giúp dễ dàng sử dụng tài nguyên HTTP.
+  # Nó độc lập với nền tảng và có thể được sử dụng trên cả dòng lệnh và trình duyệt.
   http: any
+
+  # Gói này cung cấp các cơ sở quốc tế hóa và bản địa hóa, bao gồm dịch thông điệp, số nhiều
+  # và giới tính, định dạng ngày / số và phân tích cú pháp, và văn bản hai chiều.
   intl: "^0.15.6"
 
 dev_dependencies:
@@ -47,9 +53,6 @@ flutter:
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
   assets:
-    - images/bg_weather.png
-    - images/bg_weather_1.png
-    - images/bg_weather_2.png
     - images/bg_weather_3.png
 
 
