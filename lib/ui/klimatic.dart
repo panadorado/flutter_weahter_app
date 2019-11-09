@@ -18,6 +18,7 @@ class _KlimaticState extends State<Klimatic> {
   String _cityEntered;
   int animReload = 5;
 
+  // Hiện thị thông báo khi bạn muốn thoát
   void _showExit() {
     AlertDialog dialog = new AlertDialog (
       title: Center(child: Text('Chú ý!',style: TextStyle(fontSize: 18.0, color: Colors.white),),),
@@ -37,23 +38,17 @@ class _KlimaticState extends State<Klimatic> {
     showDialog(context: context, child: dialog);
   }
 
-  /*Future<void> thenAsync() async{
-    Future.delayed(Duration(seconds: 5)).then((_){
-      setState(() => updateTempWidget(_cityEntered));
-    }).catchError((e){
-      print('failed: ${e.toString()}');
-    });
-  }*/
 
   @override
   Widget build(BuildContext context) {
-    DateTime now = DateTime.now();
     return Scaffold(
       appBar: AppBar(
         title: Text('Weather App',style: TextStyle(color: Colors.white),),
         centerTitle: true,
         backgroundColor: Color.fromARGB(250, 24, 24, 24),
       ),
+
+      // UI hiển thị nổi dung tên thành phố. ngày, tháng, năm và trạng thái thời tiết.
       body: Stack(
           children: <Widget>[
             Center(child: Image.asset('images/bg_weather_3.png', width: 360.0, fit: BoxFit.fill,),),
@@ -65,74 +60,80 @@ class _KlimaticState extends State<Klimatic> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text('${_cityEntered == null ? util.defaultCity : _cityEntered}', style: cityStyle()),
-                    Text(DateFormat('hh:mm:ss').format(now), style: tempStyle(),),
-                    Text(DateFormat('dd/MM/yyyy').format(now), style: tempStyle()),
+                    Text(DateFormat('hh:mm:ss').format(DateTime.now()), style: tempStyle(),),
+                    Text(DateFormat('dd/MM/yyyy').format(DateTime.now()), style: tempStyle()),
                     updateTempWidget(_cityEntered),
                   ],
                 ),
               ),
             ),
-          ),
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  margin: const EdgeInsets.fromLTRB(0.0, 350.0, 0.0, 0.0),
-                  color: Color.fromARGB(100, 24, 24, 24),
-                  width: 50,
-                  height: 50,
-                  child: IconButton(
-                      icon: Icon(Icons.refresh),
-                      color: Colors.white,
-                      onPressed: (){
-                        setState(() {
-                          setState(() => updateTempWidget(_cityEntered));
-                        });
-                      }
-                  ),
-                ),
-                Padding(padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0)),
-                Container(
-                  margin: const EdgeInsets.fromLTRB(0.0, 350.0, 0.0, 0.0),
-                  color: Color.fromARGB(100, 24, 24, 24),
-                  width: 50,
-                  height: 50,
-                  child: IconButton(
-                      icon: Icon(Icons.close),
-                      color: Colors.white,
-                      onPressed: (){
-                        setState(() {
-                          _showExit();
-                        });
-                      }
-                  ),
-                ),
-              ],
-            )
-          ),
-        ]
+            ),
+
+            // 2 Button Reload và CLose
+            Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      margin: const EdgeInsets.fromLTRB(0.0, 350.0, 0.0, 0.0),
+                      color: Color.fromARGB(100, 24, 24, 24),
+                      width: 50,
+                      height: 50,
+                      child: IconButton(
+                          icon: Icon(Icons.refresh),
+                          color: Colors.white,
+                          onPressed: (){
+                            setState(() {
+                              setState(() => updateTempWidget(_cityEntered));
+                            });
+                          }
+                      ),
+                    ),
+                    Padding(padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0)),
+                    Container(
+                      margin: const EdgeInsets.fromLTRB(0.0, 350.0, 0.0, 0.0),
+                      color: Color.fromARGB(100, 24, 24, 24),
+                      width: 50,
+                      height: 50,
+                      child: IconButton(
+                          icon: Icon(Icons.close),
+                          color: Colors.white,
+                          onPressed: (){
+                            setState(() {
+                              _showExit();
+                            });
+                          }
+                      ),
+                    ),
+                  ],
+                )
+            ),
+          ]
       ),
     );
   }
 
+  // Lấy dữ liệu json từ API web OpenWeather
   Future<Map> getWeather(String appId, String city) async {
-    String apiUrl = 'http://api.openweathermap.org/data/2.5/weather?q=$city,VN&appid='
-        '${util.appId}&units=metric';
+    String apiUrl = 'http://api.openweathermap.org/data/2.5/weather?q=$city,VN&units=metric&appid=${util.appId}';
 
     http.Response response = await http.get(apiUrl);
     return json.decode(response.body);
   }
 
+
   Widget updateTempWidget(String city) {
     return new FutureBuilder(
         future: getWeather(util.appId, city == null ? util.defaultCity : city),
         builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
-          //where we get all of the json data, we setup  widget etc.
+
+          // nơi nhận được tất cả dữ liệu json, thiết lập widget, v.v.
           if (snapshot.hasData) {
             Map content = snapshot.data;
             return new Column(
               children: <Widget>[
+
+                //Khởi tạo Row hiển thị hình ảnh và mô tả thời tiết
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -140,6 +141,9 @@ class _KlimaticState extends State<Klimatic> {
                     Text(content['weather'][0]['description'].toString(), style: tempStyle(),),
                   ],
                 ),
+
+                // Khởi tạo Row hiển thị trang thái thời tiết của một thành phố gồm:
+                // Nhiệt độ, độ ẩm, áp suất, tốc độ gió.
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
